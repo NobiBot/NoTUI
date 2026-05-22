@@ -1,0 +1,11 @@
+# Personal notes
+Notes/
+
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
