@@ -1,0 +1,30 @@
+Screen {
+  layout: horizontal;
+
+}
+
+#tree {
+  width: 25;
+}
+
+#editor {
+  width: 1fr;
+}
+
+NewNoteScreen {
+    align: center middle;
+}
+
+#dialog {
+    width: 40;
+    height: auto;
+    border: thick $primary;
+    padding: 1;
+}
+
+ConfirmDeleteScreen {
+    align: center middle;
+}
+Button {
+    margin: 1;
+}
