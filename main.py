@@ -1,10 +1,11 @@
 from pathlib import Path
 from textual.screen import Screen
-from textual.widgets import Input, Label, Button
-from textual.widgets import TextArea, Header, Footer
+from textual.widgets import Input, Label, Button, DirectoryTree, TextArea, Header, Footer
 from textual.containers import Horizontal, Vertical
 from textual.app import App, ComposeResult
-from textual.widgets import DirectoryTree
+
+
+
 
 class NoTUI(App):
     """A Note taking terminal application"""
@@ -14,6 +15,9 @@ class NoTUI(App):
         ("ctrl+s", "save", "Save"),
         ("n", "new_note", "New Note"),
         ("ctrl+d", "delete_note", "Delete Note"),
+        ("ctrl+e", "focus_note", "Focus Note"),
+        ("escape", "focus_tree", "Focus Tree"),
+        ("ctrl+t", "toggle_tree", "Toggle Tree")
     ]
     CSS_PATH = "NoTUI.tcss"
 
@@ -30,6 +34,18 @@ class NoTUI(App):
             textarea.text = path.read_text()
             last_row = len(textarea.document.lines) - 1
             textarea.cursor_location = (last_row, len(textarea.document.lines[last_row]))
+
+    def action_focus_note(self) -> None:
+        if self.current_file is None:
+            self.notify("No note selected", severity="warning")
+            return
+        self.query_one("#editor", TextArea).focus()
+
+    def action_focus_tree(self) -> None:
+        self.query_one("#tree", DirectoryTree).focus()
+    def action_toggle_tree(self) -> None:
+        tree = self.query_one("#tree")
+        tree.display = not tree.display
 
     def action_new_note(self) -> None:
         def handle_name(name: str | None):
@@ -59,7 +75,7 @@ class NoTUI(App):
         yield Header()
         with Horizontal():
             yield DirectoryTree("./Notes/", id="tree")
-            yield TextArea(placeholder="Notes go here...", id="editor")
+            yield TextArea(placeholder="Notes go here...", id="editor", tab_behavior="indent")
         yield Footer()
 
     def action_save(self) -> None:
@@ -72,10 +88,11 @@ class NoTUI(App):
 
 
 class NewNoteScreen(Screen):
+    CSS_PATH = "NoTUI.tcss"
     def compose(self):
         with Vertical(id="dialog"):
             yield Label("New note filename:")
-            yield Input(placeholder="my-note.txt")
+            yield Input(placeholder="Title your note here")
     def on_input_submitted(self, event: Input.Submitted):
         self.dismiss(event.value)
 
