@@ -11,7 +11,7 @@ class NoTUI(App):
     """A Note taking terminal application"""
 
     BINDINGS = [
-        ("q", "quit", "Quit"),
+        ("ctrl+q", "quit", "Quit"),
         ("ctrl+s", "save", "Save"),
         ("n", "new_note", "New Note"),
         ("ctrl+d", "delete_note", "Delete Note"),
