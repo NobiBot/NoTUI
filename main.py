@@ -15,7 +15,7 @@ class NoTUI(App):
         ("ctrl+s", "save", "Save"),
         ("n", "new_note", "New Note"),
         ("ctrl+d", "delete_note", "Delete Note"),
-        ("ctrl+e", "focus_note", "Focus Note"),
+        ("ctrl+o", "toggle_focus", "Toggle Focus"),
         ("escape", "focus_tree", "Focus Tree"),
         ("ctrl+t", "toggle_tree", "Toggle Tree")
     ]
@@ -35,14 +35,27 @@ class NoTUI(App):
             last_row = len(textarea.document.lines) - 1
             textarea.cursor_location = (last_row, len(textarea.document.lines[last_row]))
 
-    def action_focus_note(self) -> None:
-        if self.current_file is None:
-            self.notify("No note selected", severity="warning")
-            return
-        self.query_one("#editor", TextArea).focus()
+    #disables Tab for focusing the editor
+    def action_focus_next(self) -> None:
+        pass
 
+    # def action_focus_note(self) -> None:
+    #     if self.current_file is None:
+    #         self.notify("No note selected", severity="warning")
+    #         return
+    #     self.query_one("#editor", TextArea).focus()
+
+    def action_toggle_focus(self) -> None:
+        tree = self.query_one("#tree", DirectoryTree)
+        editor = self.query_one("#editor", TextArea)
+        if editor.has_focus:
+            tree.focus()
+        else:
+            editor.focus()
+    # For focusing the tree with the esc key
     def action_focus_tree(self) -> None:
         self.query_one("#tree", DirectoryTree).focus()
+
     def action_toggle_tree(self) -> None:
         tree = self.query_one("#tree")
         tree.display = not tree.display
