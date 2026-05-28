@@ -28,3 +28,6 @@ ConfirmDeleteScreen {
 Button {
     margin: 1;
 }
+#tree.full-width {
+    width: 1fr;
+}

@@ -31,31 +31,34 @@ class NoTUI(App):
         if path.is_file():
             self.current_file = path
             textarea = self.query_one("#editor", TextArea)
+            textarea.display = True
             textarea.text = path.read_text()
             last_row = len(textarea.document.lines) - 1
             textarea.cursor_location = (last_row, len(textarea.document.lines[last_row]))
+            tree = self.query_one("#tree")
+            tree.remove_class("full-width")
 
     #disables Tab for focusing the editor
     def action_focus_next(self) -> None:
         pass
 
-    # def action_focus_note(self) -> None:
-    #     if self.current_file is None:
-    #         self.notify("No note selected", severity="warning")
-    #         return
-    #     self.query_one("#editor", TextArea).focus()
-
+    # Toggles between the DirectoryTree and the TextArea
     def action_toggle_focus(self) -> None:
         tree = self.query_one("#tree", DirectoryTree)
         editor = self.query_one("#editor", TextArea)
+        if not editor.display:
+            tree.focus()
+            return
         if editor.has_focus:
             tree.focus()
         else:
             editor.focus()
+
     # For focusing the tree with the esc key
     def action_focus_tree(self) -> None:
         self.query_one("#tree", DirectoryTree).focus()
 
+    # for hiding the DirectoryTree
     def action_toggle_tree(self) -> None:
         tree = self.query_one("#tree")
         tree.display = not tree.display
@@ -66,7 +69,11 @@ class NoTUI(App):
                 path = Path("./Notes") / name
                 path.write_text("")
                 self.current_file = path
-                self.query_one("#editor", TextArea).text = ""
+                textarea = self.query_one("#editor", TextArea)
+                textarea.display = True
+                tree = self.query_one("#tree")
+                tree.remove_class("full-width")
+                textarea.text = ""
                 self.query_one(DirectoryTree).reload()
         self.push_screen(NewNoteScreen(), handle_name)
 
@@ -78,6 +85,10 @@ class NoTUI(App):
             if confirmed:
                 self.current_file.unlink()
                 self.current_file = None
+                textarea = self.query_one("#editor")
+                textarea.display = False
+                tree = self.query_one("#tree")
+                tree.add_class("full-width")
                 self.query_one("#editor", TextArea).text = ""
                 self.query_one(DirectoryTree).reload()
                 self.notify("Note deleted", severity="warning")
@@ -90,6 +101,13 @@ class NoTUI(App):
             yield DirectoryTree("./Notes/", id="tree")
             yield TextArea(placeholder="Notes go here...", id="editor", tab_behavior="indent")
         yield Footer()
+
+    def on_mount(self) -> None:
+        editor = self.query_one("#editor")
+        tree = self.query_one("#tree")
+        editor.display = False
+        tree.add_class("full-width")
+
 
     def action_save(self) -> None:
         if self.current_file is None:
