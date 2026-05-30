@@ -4,6 +4,8 @@ from textual.widgets import Input, Label, Button, DirectoryTree, TextArea, Heade
 from textual.containers import Horizontal, Vertical
 from textual.app import App, ComposeResult
 
+NOTES_DIR = Path(__file__).resolve().parent.parent.parent / "Notes"
+
 
 class NoTUI(App):
     """A Note taking terminal application"""
@@ -59,7 +61,7 @@ class NoTUI(App):
     def action_new_note(self) -> None:
         def handle_name(name: str | None):
             if name:
-                path = Path("./Notes") / name
+                path = NOTES_DIR / name
                 path.write_text("")
                 self.current_file = path
                 textarea = self.query_one("#editor", TextArea)
@@ -90,11 +92,12 @@ class NoTUI(App):
     def compose(self) -> ComposeResult:
         yield Header()
         with Horizontal():
-            yield DirectoryTree("./Notes/", id="tree")
+            yield DirectoryTree(str(NOTES_DIR), id="tree")
             yield TextArea(placeholder="Notes go here...", id="editor", tab_behavior="indent")
         yield Footer()
 
     def on_mount(self) -> None:
+        NOTES_DIR.mkdir(parents=True, exist_ok=True)
         editor = self.query_one("#editor")
         tree = self.query_one("#tree")
         editor.display = False
