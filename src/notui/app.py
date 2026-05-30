@@ -5,8 +5,6 @@ from textual.containers import Horizontal, Vertical
 from textual.app import App, ComposeResult
 
 
-
-
 class NoTUI(App):
     """A Note taking terminal application"""
 
@@ -21,12 +19,11 @@ class NoTUI(App):
     ]
     CSS_PATH = "NoTUI.tcss"
 
-
     def __init__(self):
         super().__init__()
         self.current_file: Path | None = None
 
-    def on_directory_tree_file_selected(self, event:DirectoryTree.FileSelected) -> None:
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
         path = event.path
         if path.is_file():
             self.current_file = path
@@ -38,11 +35,9 @@ class NoTUI(App):
             tree = self.query_one("#tree")
             tree.remove_class("full-width")
 
-    #disables Tab for focusing the editor
     def action_focus_next(self) -> None:
         pass
 
-    # Toggles between the DirectoryTree and the TextArea
     def action_toggle_focus(self) -> None:
         tree = self.query_one("#tree", DirectoryTree)
         editor = self.query_one("#editor", TextArea)
@@ -54,11 +49,9 @@ class NoTUI(App):
         else:
             editor.focus()
 
-    # For focusing the tree with the esc key
     def action_focus_tree(self) -> None:
         self.query_one("#tree", DirectoryTree).focus()
 
-    # for hiding the DirectoryTree
     def action_toggle_tree(self) -> None:
         tree = self.query_one("#tree")
         tree.display = not tree.display
@@ -92,8 +85,7 @@ class NoTUI(App):
                 self.query_one("#editor", TextArea).text = ""
                 self.query_one(DirectoryTree).reload()
                 self.notify("Note deleted", severity="warning")
-        self.push_screen(ConfirmDeleteScreen(),handle_confirm)
-
+        self.push_screen(ConfirmDeleteScreen(), handle_confirm)
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -108,14 +100,12 @@ class NoTUI(App):
         editor.display = False
         tree.add_class("full-width")
 
-
     def action_save(self) -> None:
         if self.current_file is None:
             return
         text = self.query_one("#editor", TextArea).text
         self.current_file.write_text(text)
         self.notify("Saved!", severity="success")
-
 
 
 class NewNoteScreen(Screen):
@@ -127,17 +117,13 @@ class NewNoteScreen(Screen):
     def on_input_submitted(self, event: Input.Submitted):
         self.dismiss(event.value)
 
+
 class ConfirmDeleteScreen(Screen):
-        def compose(self):
-            with Vertical(id="dialog"):
-                yield Label("Delete this note?")
-                with Horizontal():
-                    yield Button("Yes", variant="error", id="yes")
-                    yield Button("No", variant="primary", id="no")
-        def on_button_pressed(self, event: Button.Pressed):
-            self.dismiss(event.button.id == "yes")
-
-
-if __name__ == "__main__":
-    app = NoTUI()
-    app.run()
+    def compose(self):
+        with Vertical(id="dialog"):
+            yield Label("Delete this note?")
+            with Horizontal():
+                yield Button("Yes", variant="error", id="yes")
+                yield Button("No", variant="primary", id="no")
+    def on_button_pressed(self, event: Button.Pressed):
+        self.dismiss(event.button.id == "yes")
